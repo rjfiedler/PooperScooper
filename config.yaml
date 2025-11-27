@@ -2,21 +2,21 @@
 
 # GPIO Pin Mappings (BCM numbering)
 gpio:
-  boom_up: 17
-  boom_down: 18
-  arm_up: 27
-  arm_down: 22
-  bucket_in: 23
-  bucket_out: 24
-  turret_left: 25
-  turret_right: 5
   move_forward: 6
   move_backward: 13
+  arm_down: 22
+  arm_up: 27
+  turret_left: 25
+  turret_right: 5
   turn_left: 19
-  turn_right: 26
+  turn_right: 2698
+  boom_up: 17
+  boom_down: 18
+  bucket_in: 23
+  bucket_out: 24
   special_1: 12
   special_2: 16
-  # Spare channels: 20, 21
+  # Spare channels: 20, 21 and 23
 
 # Button Press Timing (seconds)
 timing:
