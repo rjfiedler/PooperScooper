@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+
+# Logs
+logs/
+*.log
+
+# Models and training data
+models/*.tflite
+models/*.pt
+models/*.onnx
+models/*.h5
+training_data/
+runs/
+
+# Calibration data
+models/audio_calibration.json
+
+# Test outputs
+test_frame.jpg
+*.jpg
+*.png
+*.mp4
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+temp/
+tmp/
+*.tmp

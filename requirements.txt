@@ -1,0 +1,40 @@
+# Computer Vision
+tensorflow==2.15.0  # Full TensorFlow for training
+tflite-runtime==2.14.0  # Lightweight inference (use this on Pi, comment out tensorflow)
+opencv-python==4.8.1
+picamera2==0.3.17  # Arducam support
+pillow==10.1.0
+ultralytics==8.1.0  # YOLOv8 training
+
+# Hardware Control
+gpiozero==2.0.1  # GPIO control
+pigpio==1.78  # Backup GPIO library
+
+# Audio Processing
+sounddevice==0.4.6  # Audio capture
+numpy==1.24.3  # FFT operations
+scipy==1.11.4  # Signal processing
+
+# Control Systems
+py-trees==2.2.3  # Behavior trees
+transitions==0.9.0  # State machines
+
+# Web Interface & Monitoring
+flask==3.0.0  # Web server for monitoring
+flask-socketio==5.3.5  # Real-time updates
+flask-cors==4.0.0  # CORS support
+paho-mqtt==1.6.1  # MQTT for status messages
+
+# Database & Learning
+sqlalchemy==2.0.23  # Database ORM
+scikit-learn==1.3.2  # Machine learning utilities
+pandas==2.1.4  # Data analysis
+
+# Utilities
+python-dotenv==1.0.0  # Configuration
+pyyaml==6.0.1  # Config files
+loguru==0.7.2  # Advanced logging
+click==8.1.7  # CLI interface
+
+# Optional (uncomment if needed)
+# ikpy==3.3.3  # Inverse kinematics (if adding position control later)

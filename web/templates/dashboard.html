@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pooper Scooper - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚜 Pooper Scooper Control Dashboard</h1>
+            <nav>
+                <a href="/" class="active">Dashboard</a>
+                <a href="/analytics">Analytics</a>
+            </nav>
+        </header>
+
+        <div class="main-content">
+            <!-- Control Panel -->
+            <div class="control-panel card">
+                <h2>Control</h2>
+                <div class="status-indicator">
+                    <span class="status-dot" id="status-dot"></span>
+                    <span id="status-text">Idle</span>
+                </div>
+
+                <div class="button-group">
+                    <button id="btn-start" class="btn btn-primary" onclick="startPatrol()">
+                        Start Patrol
+                    </button>
+                    <button id="btn-stop" class="btn btn-danger" onclick="stopPatrol()">
+                        Stop
+                    </button>
+                    <button id="btn-home" class="btn btn-secondary" onclick="returnHome()">
+                        Return Home
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Stats -->
+            <div class="stats-grid">
+                <div class="stat-card card">
+                    <h3>Coverage</h3>
+                    <div class="stat-value" id="stat-coverage">0%</div>
+                </div>
+                <div class="stat-card card">
+                    <h3>Pickups Today</h3>
+                    <div class="stat-value" id="stat-pickups">0</div>
+                </div>
+                <div class="stat-card card">
+                    <h3>Success Rate</h3>
+                    <div class="stat-value" id="stat-success">0%</div>
+                </div>
+                <div class="stat-card card">
+                    <h3>Position</h3>
+                    <div class="stat-value-small">
+                        <span id="stat-pos-x">0.0</span>m,
+                        <span id="stat-pos-y">0.0</span>m
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patrol Map -->
+            <div class="map-container card">
+                <h2>Patrol Map</h2>
+                <canvas id="patrol-map" width="600" height="600"></canvas>
+                <div class="map-legend">
+                    <span><span class="legend-dot" style="background:#4CAF50"></span> Visited</span>
+                    <span><span class="legend-dot" style="background:#2196F3"></span> Home</span>
+                    <span><span class="legend-dot" style="background:#F44336"></span> Poop Found</span>
+                    <span><span class="legend-dot" style="background:#FF9800"></span> Current</span>
+                </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="activity-log card">
+                <h2>Activity Log</h2>
+                <div id="log-container">
+                    <div class="log-entry">System ready</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket connection
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            addLog('Connected to Pooper Scooper');
+        });
+
+        socket.on('status_update', (data) => {
+            updateDashboard(data);
+        });
+
+        // Control functions
+        function startPatrol() {
+            fetch('/api/start_patrol', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    addLog('Patrol started');
+                    updateStatus('patrolling');
+                })
+                .catch(err => addLog('Error: ' + err));
+        }
+
+        function stopPatrol() {
+            fetch('/api/stop_patrol', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    addLog('Patrol stopped');
+                    updateStatus('idle');
+                })
+                .catch(err => addLog('Error: ' + err));
+        }
+
+        function returnHome() {
+            fetch('/api/return_home', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    addLog('Returning to home');
+                    updateStatus('returning_home');
+                })
+                .catch(err => addLog('Error: ' + err));
+        }
+
+        // Update dashboard
+        function updateDashboard(data) {
+            // Status
+            updateStatus(data.patrol_status);
+
+            // Stats
+            document.getElementById('stat-coverage').textContent =
+                data.coverage_percent.toFixed(1) + '%';
+            document.getElementById('stat-pickups').textContent = data.pickups_today;
+            document.getElementById('stat-success').textContent =
+                (data.success_rate * 100).toFixed(1) + '%';
+            document.getElementById('stat-pos-x').textContent = data.current_position.x.toFixed(2);
+            document.getElementById('stat-pos-y').textContent = data.current_position.y.toFixed(2);
+
+            // Update map
+            drawMap(data);
+        }
+
+        function updateStatus(status) {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+
+            if (status === 'patrolling') {
+                statusDot.className = 'status-dot status-active';
+                statusText.textContent = 'Patrolling';
+            } else if (status === 'returning_home') {
+                statusDot.className = 'status-dot status-warning';
+                statusText.textContent = 'Returning Home';
+            } else {
+                statusDot.className = 'status-dot status-idle';
+                statusText.textContent = 'Idle';
+            }
+        }
+
+        function drawMap(data) {
+            const canvas = document.getElementById('patrol-map');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Clear canvas
+            ctx.fillStyle = '#f5f5f5';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw grid
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            const cellSize = width / 20;  // 20x20 grid for visualization
+            for (let i = 0; i <= 20; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * cellSize, 0);
+                ctx.lineTo(i * cellSize, height);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, i * cellSize);
+                ctx.lineTo(width, i * cellSize);
+                ctx.stroke();
+            }
+
+            // Draw home position (blue)
+            ctx.fillStyle = '#2196F3';
+            ctx.beginPath();
+            ctx.arc(width/2, height/2, 10, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Draw current position (orange)
+            const posX = (data.current_position.x / 10) * width;
+            const posY = (data.current_position.y / 10) * height;
+            ctx.fillStyle = '#FF9800';
+            ctx.beginPath();
+            ctx.arc(posX, posY, 8, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        function addLog(message) {
+            const logContainer = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logContainer.insertBefore(entry, logContainer.firstChild);
+
+            // Limit to 50 entries
+            while (logContainer.children.length > 50) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+
+        // Initial load
+        fetch('/api/status')
+            .then(r => r.json())
+            .then(data => updateDashboard(data));
+
+        // Refresh stats every 2 seconds
+        setInterval(() => {
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(data => updateDashboard(data));
+        }, 2000);
+    </script>
+</body>
+</html>

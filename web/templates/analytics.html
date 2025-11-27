@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pooper Scooper - Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Pooper Scooper Analytics</h1>
+            <nav>
+                <a href="/">Dashboard</a>
+                <a href="/analytics" class="active">Analytics</a>
+            </nav>
+        </header>
+
+        <div class="main-content">
+            <div class="analytics-grid">
+                <div class="card">
+                    <h2>Overall Performance</h2>
+                    <div class="metric-row">
+                        <span>Total Attempts:</span>
+                        <span id="total-attempts">-</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Successful Pickups:</span>
+                        <span id="successful-pickups">-</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Success Rate:</span>
+                        <span id="overall-success-rate">-</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Total Sessions:</span>
+                        <span id="total-sessions">-</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Learned Parameters</h2>
+                    <p class="info-text">Optimized arm timing parameters based on successful attempts:</p>
+                    <div class="metric-row">
+                        <span>Boom Up Time:</span>
+                        <span id="param-boom-up">-</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Boom Down Time:</span>
+                        <span id="param-boom-down">-</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Arm Down Time:</span>
+                        <span id="param-arm-down">-</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Bucket Scoop Time:</span>
+                        <span id="param-bucket">-</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Failure Modes</h2>
+                    <div id="failure-modes">
+                        <p class="info-text">No failure data yet</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Hotspot Locations</h2>
+                    <div id="hotspot-list">
+                        <p class="info-text">No hotspots identified yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load analytics data
+        function loadAnalytics() {
+            fetch('/api/metrics')
+                .then(r => r.json())
+                .then(data => {
+                    // Update UI with metrics
+                    document.getElementById('total-attempts').textContent = data.total_attempts || '-';
+                    document.getElementById('successful-pickups').textContent = data.successful_pickups || '-';
+                    document.getElementById('overall-success-rate').textContent =
+                        data.success_rate ? (data.success_rate * 100).toFixed(1) + '%' : '-';
+                    document.getElementById('total-sessions').textContent = data.total_sessions || '-';
+                })
+                .catch(err => console.error('Error loading analytics:', err));
+        }
+
+        // Load on page load
+        loadAnalytics();
+
+        // Refresh every 10 seconds
+        setInterval(loadAnalytics, 10000);
+    </script>
+</body>
+</html>

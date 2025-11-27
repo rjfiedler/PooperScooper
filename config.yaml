@@ -1,0 +1,116 @@
+# Pooper Scooper Configuration File
+
+# GPIO Pin Mappings (BCM numbering)
+gpio:
+  boom_up: 17
+  boom_down: 18
+  arm_up: 27
+  arm_down: 22
+  bucket_in: 23
+  bucket_out: 24
+  turret_left: 25
+  turret_right: 5
+  move_forward: 6
+  move_backward: 13
+  turn_left: 19
+  turn_right: 26
+  special_1: 12
+  special_2: 16
+  # Spare channels: 20, 21
+
+# Button Press Timing (seconds)
+timing:
+  button_press_duration: 0.1  # Default button press
+  boom_up_full: 2.0  # Full boom raise
+  boom_down_full: 2.0  # Full boom lower
+  arm_up_full: 1.5  # Full arm raise
+  arm_down_full: 1.5  # Full arm lower
+  bucket_scoop: 1.0  # Bucket scoop motion
+  turret_rotate_90: 1.2  # 90 degree rotation estimate
+
+# Camera Settings
+camera:
+  resolution: [1920, 1080]  # Arducam 8MP can handle this
+  framerate: 10  # FPS for capture
+  inference_resolution: [416, 416]  # YOLOv8 input size
+  rotation: 0  # Camera rotation (0, 90, 180, 270)
+
+# Vision Detection
+vision:
+  model_path: "models/poop_detector.tflite"
+  confidence_threshold: 0.7  # Minimum confidence for detection
+  nms_threshold: 0.45  # Non-maximum suppression
+  multi_frame_verification: 3  # Detect in N consecutive frames
+  red_flag_hsv_lower: [0, 100, 100]  # HSV range for red flag
+  red_flag_hsv_upper: [10, 255, 255]
+  min_object_size: 20  # Minimum pixel area
+  max_object_size: 5000  # Maximum pixel area
+
+# Audio Monitoring
+audio:
+  sample_rate: 44100
+  channels: 1
+  window_duration: 0.5  # Seconds of audio to analyze
+  stall_frequency_threshold: 100  # Hz - below this indicates stall
+  frequency_drop_percent: 50  # % drop from baseline indicates stall
+
+# Safety Parameters
+safety:
+  watchdog_timeout: 5.0  # Seconds without heartbeat triggers e-stop
+  max_operation_time: 1800  # 30 minutes maximum session
+  human_detection_distance: 2.0  # Meters - stop if human detected closer
+  stall_retry_attempts: 2  # Times to retry before giving up
+  emergency_stop_enabled: true
+
+# Motion Planning
+motion:
+  approach_distance: 0.3  # Meters to stop before target
+  scoop_depth: 0.05  # Meters to lower bucket
+  disposal_height: 0.2  # Meters to lift for transport
+  navigation_speed: "medium"  # slow, medium, fast
+
+# Patrol Configuration
+patrol:
+  area:
+    x: 0  # Starting x position (meters)
+    y: 0  # Starting y position (meters)
+    width: 10  # Patrol area width (meters)
+    height: 10  # Patrol area height (meters)
+  home_position:
+    x: 0  # Home x coordinate (meters)
+    y: 0  # Home y coordinate (meters)
+  grid_cell_size: 0.5  # Size of each grid cell (meters)
+  pattern: "lawnmower"  # lawnmower, spiral, grid
+  overlap_percent: 20  # Overlap between patrol rows (%)
+  coverage_threshold: 95  # Return home when coverage exceeds this (%)
+  max_patrol_time: 1200  # Maximum patrol duration (20 minutes)
+
+# Learning Parameters
+learning:
+  enabled: true
+  database_path: "data/pooperscooper.db"
+  min_attempts_before_learning: 10  # Wait for this many attempts before adjusting
+  success_rate_threshold: 0.7  # Trigger optimization if below this
+  parameter_adjustment_rate: 0.1  # How much to adjust parameters (10%)
+  exploration_rate: 0.1  # Epsilon for epsilon-greedy (10% exploration)
+  rolling_window_size: 20  # Attempts to consider for success rate
+
+# Behavior Tree
+behavior:
+  pickup_timeout: 30  # Seconds per pickup attempt
+  return_to_base_battery_percent: 20  # Return when battery low (if monitored)
+
+# Remote Monitoring
+monitoring:
+  mqtt_broker: "localhost"
+  mqtt_port: 1883
+  web_interface_port: 5000
+  stream_video: false  # Set true for video streaming (higher power)
+  status_update_interval: 1.0  # Seconds between status updates
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_file: "logs/pooperscooper.log"
+  max_log_size_mb: 10
+  backup_count: 5
