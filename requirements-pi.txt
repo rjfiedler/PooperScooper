@@ -1,0 +1,35 @@
+# Computer Vision (Lightweight for Raspberry Pi)
+tflite-runtime==2.14.0  # Lightweight inference only (no full TensorFlow)
+opencv-python>=4.8.0
+picamera2>=0.3.17  # Arducam support
+pillow>=10.1.0
+
+# Hardware Control
+gpiozero>=2.0
+pigpio>=1.78
+
+# Audio Processing
+sounddevice>=0.4.6
+numpy>=1.24.0
+scipy>=1.11.0
+
+# Control Systems
+py-trees>=2.2.3
+transitions>=0.9.0
+
+# Web Interface & Monitoring
+flask>=3.0.0
+flask-socketio>=5.3.0
+flask-cors>=4.0.0
+paho-mqtt>=1.6.1
+
+# Database & Learning
+sqlalchemy>=2.0.0
+scikit-learn>=1.3.0
+pandas>=2.1.0
+
+# Utilities
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+loguru>=0.7.2
+click>=8.1.7

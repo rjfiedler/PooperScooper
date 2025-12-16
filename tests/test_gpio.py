@@ -4,10 +4,15 @@ GPIO Test Script - Test all excavator controls
 Activates each GPIO pin for 1 second to verify PC817 optocoupler connections
 """
 
+import sys
 import time
 import yaml
 from pathlib import Path
 from loguru import logger
+
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 # Import excavator controller
 from hardware.excavator import ExcavatorController
@@ -21,7 +26,7 @@ def test_all_controls(simulate: bool = False):
         simulate: If True, run in simulation mode (no actual GPIO)
     """
     # Load config
-    config_path = Path(__file__).parent / "config.yaml"
+    config_path = Path(__file__).parent.parent / "config.yaml"
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 
@@ -32,7 +37,7 @@ def test_all_controls(simulate: bool = False):
 
     excavator = ExcavatorController(config, simulate=simulate)
 
-    test_duration = 1.0  # 1 second per test
+    test_duration = 0.5  # 1 second per test
 
     # List of all controls to test
     tests = [
@@ -58,6 +63,7 @@ def test_all_controls(simulate: bool = False):
 
     # Test each control
     for i, (name, gpio_obj, description) in enumerate(tests, 1):
+        time.sleep(0.2)
         logger.info(f"[{i}/{len(tests)}] Testing: {name}")
         logger.info(f"    Description: {description}")
         logger.info(f"    GPIO Pin: {gpio_obj.pin if hasattr(gpio_obj, 'pin') else 'N/A'}")
@@ -104,7 +110,7 @@ def test_quick_sequence(simulate: bool = False):
         simulate: If True, run in simulation mode
     """
     # Load config
-    config_path = Path(__file__).parent / "config.yaml"
+    config_path = Path(__file__).parent.parent / "config.yaml"
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 
@@ -164,7 +170,7 @@ def test_single_control(control_name: str, duration: float = 1.0, simulate: bool
         simulate: If True, run in simulation mode
     """
     # Load config
-    config_path = Path(__file__).parent / "config.yaml"
+    config_path = Path(__file__).parent.parent / "config.yaml"
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 

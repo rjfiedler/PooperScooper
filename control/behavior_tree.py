@@ -5,7 +5,7 @@ Main control logic using py_trees framework
 
 import time
 import py_trees
-from py_trees.common import Status
+from py_trees import Status
 from loguru import logger
 from typing import Any, Optional
 
